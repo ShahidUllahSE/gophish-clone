@@ -1,0 +1,269 @@
+
+    <!-- <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sending Profile</title>
+</head>
+<body>
+    <h1>Sending Profile</h1>
+    <div class="profile">
+        <label for="profileName" class="profile-label">Name:</label>
+        <input type="text" id="profileName" class="profile-input" placeholder="Profile Name">
+        <label for="smtpServer" class="profile-label">Interface Type:</label>
+        <input type="text" id="smtpServer" class="profile-input" placeholder="SMTP Server">
+        <label for="port" class="profile-label">SMTP From:</label>
+        <input type="text" id="port" class="profile-input" placeholder="Port">
+        <label for="username" class="profile-label">Host:</label>
+        <input type="text" id="username" class="profile-input" placeholder="Username">
+        <label for="password" class="profile-label">Password:</label>
+        <input type="password" id="password" class="profile-input" placeholder="Password">
+    </div>
+
+    <script>
+        // Function to retrieve and update profile data from localStorage
+        function updateProfileData() {
+            var profileData = JSON.parse(localStorage.getItem('sendingProfile'));
+
+            if (profileData) {
+                document.getElementById('profileName').value = profileData.profileName;
+                document.getElementById('smtpServer').value = profileData.smtpServer;
+                document.getElementById('port').value = profileData.port;
+                document.getElementById('username').value = profileData.username;
+                document.getElementById('password').value = profileData.password;
+            }
+        }
+
+        // Call the updateProfileData function to load initial data
+        updateProfileData();
+
+        // Listen for changes in localStorage and update the profile data
+        window.addEventListener('storage', function (e) {
+            if (e.key === 'sendingProfile') {
+                updateProfileData();
+            }
+        });
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <style>
+        /* Styling for the profile page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #010203;
+            font-size: 24px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            overflow-y: auto; /* Added scrolling to the content */
+            max-height: 80%; /* Added max-height for scrolling */
+        }
+        .profile {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .hidden {
+            display: none;
+        }
+        /* Add more styles as needed */
+        .no-campaign {
+            background-color: #33c5ff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .profile-label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .profile-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .profile-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s; /* Add a smooth transition effect */
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Add hover effect to buttons in pop-up windows */
+        .profile-button:hover,
+        .edit-button:hover,
+        .save-profile:hover,
+        .send-email-button:hover {
+            background-color: #0056b3; /* Change background color on hover */
+            color: #fff; /* Change text color on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="popup" id="profilePopup">
+        <div class="popup-content">
+            <span class="close-button" onclick="closePopup('profilePopup')">&times;</span>
+            <h2>Create Profile</h2>
+            <div class="profile">
+                <label for="profileName" class="profile-label">Name:</label>
+                <input type="text" id="profileName" class="profile-input" placeholder="Profile Name">
+                <label for="smtpServer" class="profile-label">Interface Type:</label>
+                <input type="text" id="smtpServer" class="profile-input" placeholder="SMTP Server">
+                <label for="port" class="profile-label">SMTP From:</label>
+                <input type="text" id="port" class="profile-input" placeholder="Port">
+                <label for="username" class="profile-label">Host:</label>
+                <input type="text" id="username" class="profile-input" placeholder="Username">
+                <label for="password" class="profile-label">Password:</label>
+                <input type="password" id="password" class="profile-input" placeholder="Password">
+                <button class="edit-button" onclick="editProfile()">Edit Profile</button>
+                <button class="save-profile" onclick="saveProfile()">Save Profile</button>
+                <button class="send-email-button" onclick="openEmailPopup()">Send Test Email</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup for sending a test email -->
+    <div class="popup" id="emailPopup">
+        <div class="popup-content">
+            <span class="close-button" onclick="closePopup('emailPopup')">&times;</span>
+            <h2>Send Test Email</h2>
+            <div class="email-details">
+                <label for="to" class="profile-label">To:</label>
+                <input type="text" id="to" class="profile-input" placeholder="Recipient's Email">
+                <label for="subject" class="profile-label">Subject:</label>
+                <input type="text" id="subject" class="profile-input" placeholder="Email Subject">
+                <label for="message" class="profile-label">Message:</label>
+                <textarea id="message" class="profile-input" rows="4" placeholder="Email Message"></textarea>
+                <button class="send-email-button" onclick="sendTestEmail()">Send Email</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      // JavaScript function to open the profile popup
+      function openProfilePopup() {
+          openPopup('profilePopup');
+      }
+  
+      // JavaScript function to edit the profile
+      function editProfile() {
+          // Enable the form fields for editing
+          document.getElementById('profileName').disabled = false;
+          document.getElementById('smtpServer').disabled = false;
+          document.getElementById('port').disabled = false;
+          document.getElementById('username').disabled = false;
+          document.getElementById('password').disabled = false;
+      }
+  
+      // function saveProfile() {
+      //     // Your save profile logic
+
+          function saveProfile() {
+var profileData = {
+profileName: document.getElementById('profileName').value,
+smtpServer: document.getElementById('smtpServer').value,
+port: document.getElementById('port').value,
+username: document.getElementById('username').value,
+password: document.getElementById('password').value,
+};
+
+// Store the profile data in localStorage
+localStorage.setItem('profileData', JSON.stringify(profileData));
+
+// Disable the form fields after saving
+document.getElementById('profileName').disabled = true;
+document.getElementById('smtpServer').disabled = true;
+document.getElementById('port').disabled = true;
+document.getElementById('username').disabled = true;
+document.getElementById('password').disabled = true;
+
+// Close the profile popup
+closePopup('profilePopup');
+
+// Reload the page to update the sending profile (you may use a more efficient method)
+location.reload();
+}
+
+      // }
+  
+      // JavaScript function to open the email popup
+      function openEmailPopup() {
+          openPopup('emailPopup');
+      }
+  
+      // JavaScript function to send a test email
+      function sendTestEmail() {
+  var to = document.getElementById('to').value;
+  var subject = document.getElementById('subject').value;
+  var message = document.getElementById('message').value;
+
+  // Log the data in sentence case with labels
+  console.log("To: " + to);
+  console.log("Subject: " + subject);
+  console.log("Message: " + message);
+
+  // Close the email popup
+  closePopup('emailPopup');
+}
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

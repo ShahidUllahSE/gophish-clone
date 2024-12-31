@@ -1,0 +1,505 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+
+
+{% endblock stylesheets %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:700,500' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href="/assets/css/dist/gophish.css" rel="stylesheet" type="text/css">
+    <style>
+        /* Styling for the page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #010203;
+            font-size: 24px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            overflow-y: auto; /* Added scrolling to the content */
+            max-height: 80%; /* Added max-height for scrolling */
+        }
+        .profile {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .hidden {
+            display: none;
+        }
+        /* Add more styles as needed */
+        .no-campaign {
+            background-color: #33c5ff;
+            color: white;
+            padding: 5px;
+            text-align: left;
+        }
+        .line {
+            width: 100%;
+            height: 1px;
+            background-color: #333;
+        }
+        .profile-label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .profile-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .profile-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s; /* Add a smooth transition effect */
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Add hover effect to buttons in pop-up windows */
+        .profile-button:hover,
+        .edit-button:hover,
+        .save-profile:hover,
+        .send-email-button:hover {
+            background-color: #0056b3; /* Change background color on hover */
+            color: #fff; /* Change text color on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard</h1>
+        <div class="line"></div>
+        <!-- Add this in the head section of your HTML file -->
+        <!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> -->
+        <!-- <button onclick="loadEmailContent()">Load Email Template</button> -->
+
+<div id="emailContent"></div>
+
+<!-- <script>
+    function loadEmailContent() {
+        // Use jQuery to load the content of another HTML file
+        $('#emailContent').load('email_template.html');
+    }
+</script> -->
+        <p>&nbsp; </p>
+        <p class="no-campaign">No Campaign created yet, Let's try to create</p> <!-- This is the added line with a colorful background -->
+        <p>&nbsp; </p>
+        <!-- New Profile button to open the profile popup -->
+        <button id="newProfileButton" onclick="openProfilePopup()">New Profile</button>
+        <!--// In your Dashboard page -->
+        <!-- <button id="openSendingProfileButton" onclick="openSendingProfilePage()">Open Sending Profile Page</button> -->
+        <!-- // Add a link to the Sending Profile page -->
+        <!-- <a href="profile.html">Go to Sending Profile Page</a> -->
+      </div>
+        <!-- // Popup for creating/editing a profile -->
+        <div class="popup" id="profilePopup">
+            <div class="popup-content">
+                <span class="close-button" onclick="closePopup('profilePopup')">&times;</span>
+                <h2>Create Profile</h2>
+                <div class="profile">
+                    <label for="profileName" class="profile-label">Name:</label>
+                    <input type="text" id="profileName" class="profile-input" placeholder="Profile name">
+                    <label for="smtpServer" class="profile-label">Interface Type:</label>
+                    <input type="text" id="smtpServer" class="profile-input" placeholder="SMTP ">
+                    <label for="port" class="profile-label">SMTP From:</label>
+                    <input type="text" id="port" class="profile-input" placeholder="<test@example.com>">
+                    <label for="username" class="profile-label">Host:</label>
+                    <input type="text" id="username" class="profile-input" placeholder="smtp.example.com:10">
+                    <label for="admin" class="profile-label">Username:</label>
+                    <input type="text" id="admin" class="profile-input" placeholder="admin">
+                    <label for="password" class="profile-label">Password:</label>
+                    <input type="password" id="password" class="profile-input" placeholder="Password">
+                    <button class="edit-button" onclick="editProfile()">Edit Profile</button>
+                    <button class="save-profile" onclick="saveProfile()">Save Profile</button>
+                    <button class="send-email-button" onclick="openEmailPopup()">Send Test Email</button>
+                </div>                                              
+            </div>
+        </div>
+
+        <!-- //Popup for sending a test email -->
+        <div class="popup" id="emailPopup">
+            <div class="popup-content">
+                <span class="close-button" onclick="closePopup('emailPopup')">&times;</span>
+                <h2>Send Test Email</h2>
+                <div class="email-details">
+                    <label for="to" class="profile-label">To:</label>
+                    <input type="text" id="to" class="profile-input" placeholder="Recipient's Email">
+                    <label for="subject" class="profile-label">Subject:</label>
+                    <input type="text" id="subject" class="profile-input" placeholder="Email Subject">
+                    <label for="message" class="profile-label">Message:</label>
+                    <textarea id="message" class="profile-input" rows="4" placeholder="Email Message"></textarea>
+                    <button class="send-email-button" onclick="sendTestEmail()">Send Email</button>
+                    <script>
+                        function loadEmailContent() {
+                            // Use jQuery to load the content of another HTML file
+                            $('#emailContent').load('email_template.html');
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function openProfilePopup() {
+          openPopup('profilePopup');
+       }  
+
+        function openSendingProfilePage() {
+           console.log("Opening Sending Profile Page");
+        }
+
+         // JavaScript function to open the Sending Profile page
+         function openSendingProfilePage() {
+   // // You can use window.location or other methods to navigate to the Sending Profile page.
+    // // For simplicity, we'll just log a message for this example.
+           console.log("Opening Sending Profile Page");
+        }
+        // // JavaScript function to open a popup
+         function openPopup(popupId) {
+             var popup = document.getElementById(popupId);
+             popup.style.display = 'block';  //  //Corrected from popup.style display
+        }
+
+       // // JavaScript function to close a popup
+         function closePopup(popupId) {
+             var popup = document.getElementById(popupId);
+             popup.style.display = 'none'; //// Corrected from popup.style display
+         }
+
+      //  // JavaScript function to open the profile popup
+         function openProfilePopup() {
+             openPopup('profilePopup');
+         }
+
+       // // JavaScript function to edit the profile
+         function editProfile() {
+        //    // Enable the form fields for editing
+         document.getElementById('profileName').disabled = false;
+             document.getElementById('smtpServer').disabled = false;
+             document.getElementById('port').disabled = false;
+             document.getElementById('username').disabled = false;
+             document.getElementById('password').disabled = false;
+         }
+
+        function saveProfile() {
+    var profileData = {
+        profileName: document.getElementById('profileName').value,
+        smtpServer: document.getElementById('smtpServer').value,
+        port: document.getElementById('port').value,
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value,
+    };
+
+   // Store the profile data in localStorage
+    localStorage.setItem('profileData', JSON.stringify(profileData));
+
+   // Disable the form fields after saving
+    document.getElementById('profileName').disabled = true;
+    document.getElementById('smtpServer').disabled = true;
+    document.getElementById('port').disabled = true;
+    document.getElementById('username').disabled = true;
+    document.getElementById('password').disabled = true;
+
+   // Close the profile popup
+    closePopup('profilePopup');
+
+   // Reload the page to update the sending profile (you may use a more efficient method)
+    location.reload();
+}
+
+
+       // // JavaScript function to open the email popup
+        function openEmailPopup() {
+            openPopup('emailPopup');
+        }
+
+       // JavaScript function to send a test email
+        function sendTestEmail() {
+            var to = document.getElementById('to').value;
+            var subject = document.getElementById('subject').value;
+            var message = document.getElementById('message').value;
+
+            // Log the data in sentence case with labels
+            console.log("To: " + to);
+            console.log("Subject: " + subject);
+            console.log("Message: " + message);
+
+            // Close the email popup
+            closePopup('emailPopup');
+        }
+       
+    function openEmailPopup() {
+        openPopup('emailPopup');
+    }
+
+    function sendTestEmail() {
+        // Use let or const instead of var
+        var to = document.getElementById('to').value;
+        var subject = document.getElementById('subject').value;
+        var message = document.getElementById('message').value;
+
+        // Log the data in sentence case with labels
+        console.log("To: " + to);
+        console.log("Subject: " + subject);
+        console.log("Message: " + message);
+
+        // Close the email popup
+        closePopup('emailPopup');
+
+        // Send the email using AJAX
+        $.ajax({
+            type: "POST",
+            url: "/send_email/",  // Replace with the actual URL for sending emails in your Django application
+            data: {
+                to: to,
+                subject: subject,
+                message: message
+            },
+            dataType: 'json', // Assuming the server returns JSON, adjust as needed
+            success: function(response) {
+                console.log("Email sent successfully");
+                // You can handle the response as needed
+            },
+            error: function(error) {
+                console.error("Error sending email", error);
+                // Handle the error as needed
+            }
+        });
+    }
+</script>
+</body>
+</html>
+
+
+<style type="text/css">
+  #mask {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 9000;
+    background-color: #9C9B9A;
+    display: none;
+  }
+  
+  #boxes .window {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 580px;
+    height: 430px;
+    display: none;
+    z-index: 9999;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+  }
+  
+  #boxes #dialog {
+    width: 580px;
+    height: 390px;
+    padding: 0px;
+    background-color: #ffffff;
+    font-weight:bold;
+   
+    font-size: 15pt;
+  }
+  
+  #popupfoot {
+    
+    font-size: 13pt;
+    position: absolute;
+    bottom: 0px;
+    font-weight:bold;
+    width: 200px;
+    left: 140px;
+  
+  }
+  
+  
+  </style>
+  
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+  
+  <div id="boxes">
+    
+  <div id="dialog" class="window">
+  
+  
+  <p align="center">
+  <p align="center">
+  
+  
+  
+  <!-- ################################# 
+  
+  <span class="product-home-image" style="font-size:20px; color:#ff0000; font-weight:bold;"> 
+    Important Announcement</span> <br> 
+    ############################### -->
+  
+  
+  
+  
+  <p align="center">
+  <!-- <a href="jobs/HR-GIZ-28-9-2023-All Combined.pdf"target="_blank"> Documentations <img src="/apps/templates/home/new.png">  </a></p> -->
+  <a href="/static/assets/img/Final_My_CV.pdf" target="_blank">Documentations <img src="/static/assets/img/new.gif"></a>
+  
+</p>
+  
+  <p align="center">
+  <a href="/static/assets/img/cartoon.mkv"target="_blank"> Vidoes Links  <img src="/static/assets/img/new.gif">  </a></p>
+  
+  
+  
+  <!-- <p align="center">
+  <a href="news/Fall23_Fee_extension_till_9-10-23.jpg"target="_blank">Fall 23 Due Date Extended (09-10-23)<img src="images/new1.gif">  </a></p> -->
+  
+  
+  <p align="center">
+  <a href="https://www.youtube.com/watch?v=5BDgKJFZMl8&list=PLu0W_9lII9ah7DDtYtflgwMwpT3xmjXY9"target="_blank">Tutorials<img src="/static/assets/img/new.gif">  </a></p>
+  
+  
+  
+  
+  <!-- <p align="center">
+  <a href="news/Re-Admission (Sefl) 21-09-2023.jpg"target="_blank">Admission NOTICE<img src="images/new1.gif">  </a></p>
+  
+  
+  <p align="center">
+  <a href="news/NOTICE_RE_REGISTRATION_FALL_2023.jpg"target="_blank">NOTICE Re_Registration FALL_2023 <img src="images/new1.gif">  </a></p>
+  
+  
+   -->
+  
+  
+  <!-- <p align="center">
+  <a href="https://drive.google.com/drive/folders/1d90rb7xqyoEXbnrp3VbC5OYkTqwE66fp?usp=sharing"target="_blank">Semester Fee Slips for Fall-2023 <img src="images/new1.gif">  </a></p>
+  
+  
+  
+  
+  
+  
+  <p align="center">
+  <a href="news/JZ_Generator_Charges.pdf"target="_blank">Generator Charges of Jalozai Campus<img src="images/new1.gif">  </a></p>
+   -->
+  
+  <div id="popupfoot"> <a href="#" style="color:red; font-weight:bold;" class="close agree"> Close Window</a>  </div>
+  </div>
+    <div id="mask"></div>
+  </div>
+  <script language="javascript">
+  $(document).ready(function() {	
+  
+  var id = '#dialog';
+    
+  //Get the screen height and width
+  var maskHeight = $(document).height();
+  var maskWidth = $(window).width();
+    
+  //Set heigth and width to mask to fill up the whole screen
+  $('#mask').css({'width':maskWidth,'height':maskHeight});
+  
+  //transition effect
+  $('#mask').fadeIn(500);	
+  $('#mask').fadeTo("slow",0.3);	
+  // Set the desired width and height for the modal
+  $(id).css('width', '500px');
+  $(id).css('height', '300px');
+
+    
+  //Get the window height and width
+  var winH = $(window).height();
+  var winW = $(window).width();
+                
+  //Set the popup window to center
+  $(id).css('top',  winH/2-$(id).height()/2);
+  $(id).css('left', winW/2-$(id).width()/2);
+    
+  //transition effect
+  $(id).fadeIn(2000); 	
+    
+  //if close button is clicked
+  $('.window .close').click(function (e) {
+  //Cancel the link behavior
+  e.preventDefault();
+  
+  $('#mask').hide();
+  $('.window').hide();
+  });
+  
+  //if mask is clicked
+  $('#mask').click(function () {
+  $(this).hide();
+  $('.window').hide();
+  });
+    
+  });
+  
+  </script>
+  
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      md.initDashboardPageCharts();
+
+    });
+  </script>
+    <script src="/assets/js/dist/vendor.min.js"></script>
+    <script src="/assets/js/dist/app/gophish.min.js"></script>
+{% endblock javascripts %}

@@ -1,0 +1,111 @@
+/* General Layout Styles */
+body {
+    padding-top: 50px;
+}
+
+.main {
+    padding: 20px;
+}
+
+.page-header {
+    margin-bottom: 20px;
+}
+
+/* Flash Messages */
+#flashes {
+    margin-bottom: 20px;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #3498db;
+    border-color: #2980b9;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2471a3;
+}
+
+/* Nav Tabs */
+.nav-tabs {
+    margin-top: 20px;
+}
+
+/* Tables */
+.table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.table th, .table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th {
+    background-color: #3498db;
+    color: #fff;
+}
+
+/* Modals */
+.modal-header {
+    background-color: #3498db;
+    color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-title {
+    font-weight: bold;
+}
+
+.modal-body {
+    padding: 15px;
+}
+
+.modal-footer {
+    border-top: 1px solid #ddd;
+    padding: 15px;
+}
+
+/* Tooltips */
+[data-toggle="tooltip"] {
+    cursor: pointer;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Loading Spinner */
+#loading {
+    text-align: center;
+    padding: 20px;
+}
+
+.fa-spin {
+    color: #3498db;
+}
+
+/* Responsive Tables */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Optional: Adjust for specific screen sizes */
+@media (max-width: 767px) {
+    body {
+        padding-top: 0;
+    }
+
+    .main {
+        padding: 10px;
+    }
+}
+
+/* Add more custom styles as needed */

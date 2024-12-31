@@ -1,0 +1,112 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Maps {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- <div id="map"></div> -->
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Account Settings - Phishing Simulation Environment</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+    
+            .account-settings {
+                text-align: center;
+                padding: 40px;
+            }
+    
+            .account-settings h1 {
+                font-size: 36px;
+            }
+    
+            form {
+                max-width: 400px;
+                margin: 0 auto;
+            }
+    
+            label {
+                display: block;
+                text-align: left;
+            }
+    
+            input {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 20px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+    
+            .update-button {
+                background: #007BFF;
+                color: #fff;
+                padding: 10px 20px;
+                text-decoration: none;
+                border: none;
+                cursor: pointer;
+            }
+    
+            footer {
+                background: #333;
+                color: #fff;
+                text-align: center;
+                padding: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <section class="account-settings">
+            <h1>Account Settings</h1>
+            <p>Update your account information and preferences.</p>
+    
+            <form>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="yourusername">
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="youremail@example.com">
+                
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password">
+                
+                <label for="confirm-password">Confirm Password:</label>
+                <input type="password" id="confirm-password" name="confirm-password">
+                
+                <button class="update-button">Update Account</button>
+            </form>
+        </section>
+    
+        <footer>
+            <p>&copy; 2023 Phishing Simulation Environment. All rights reserved.</p>
+        </footer>
+    </body>
+    </html>
+    
+
+
+
+   <!-- Google Maps Plugin   
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
+
+  <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      demo.initGoogleMaps();
+    });
+  </script> -->
+  {% endblock content %}
+  
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %} {% endblock javascripts %}

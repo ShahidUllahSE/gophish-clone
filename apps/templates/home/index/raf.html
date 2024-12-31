@@ -1,0 +1,551 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Tables {% endblock %}
+
+
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<style>
+  /* General Layout Styles */
+  body {
+    font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+  }
+
+  .main {
+    margin-top: 20px;
+  }
+
+  .page-header {
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #444;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background-color: #2980b9;
+    border-color: #2980b9;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .btn-primary:hover {
+    background-color: #1f618d;
+    border-color: #1a5276;
+  }
+
+  .btn {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Table */
+  table.table {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  table.table th,
+  table.table td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+  }
+
+  /* Modal */
+  .modal-header {
+    background-color: #f3f4f5;
+    color: #444;
+    border-bottom: 2px solid #ccc;
+  }
+
+  .modal-title {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-footer {
+    border-top: 2px solid #ddd;
+  }
+
+  /* Form elements */
+  .form-group input {
+    margin-bottom: 10px;
+  }
+
+  /* No Profile Message */
+  .no-profile {
+    background-color: #dfe6e9;
+    padding: 10px;
+    color: #444;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 1px dashed #b2bec3;
+  }
+
+  /* Line Separator */
+  .line {
+    width: 100%;
+    height: 1px;
+    background-color: #ccc;
+    margin-bottom: 20px;
+  }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="col-md-12 main">
+  <h1 class="">Users &amp; Groups</h1>
+  
+  <!-- Flash Messages -->
+  {% include 'includes/flash_messages.html' %}
+  
+  <!-- No Profile Message -->
+  <p id="noProfileMessage" class="no-profile">
+    No group created yet. Let's try to create one.
+  </p>
+
+  <!-- New Group Button -->
+  <div class="text-left">
+    <button type="button" class="btn btn-primary" onclick="openNewGroupModal()" data-toggle="modal" data-backdrop="static" data-target="#modal">
+      <i class="fa fa-plus"></i> New Group
+    </button>
+  </div>
+
+  <!-- Group Table -->
+  <div class="table-responsive">
+    <table id="groupTable" class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th># of Members</th>
+          <th>Modified Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="groupTableBody">
+        {% for group in groups %}
+        <tr data-group-id="{{ group.id }}">
+          <td>{{ group.name }}</td>
+          <td>{{ group.user_count }}</td>
+          <td>{{ group.updated_at }}</td>
+          <td>
+            <button class="btn btn-danger btn-sm delete-btn" data-group-id="{{ group.id }}">Delete</button>
+            <button class="btn btn-info btn-sm edit-btn" data-group-id="{{ group.id }}">Edit</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+        <h4 class="modal-title" id="groupModalLabel">New Group</h4>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <!-- Group Name Input -->
+        <label for="name" class="control-label">Group Name:</label>
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Enter group name" id="name" autofocus />
+        </div>
+
+        <!-- Bulk Import Section -->
+        <div class="form-group">
+          <label for="csvupload" class="btn btn-danger">
+            <i class="fa fa-upload"></i> Bulk Import Users
+            <input type="file" id="csvupload" multiple style="display:none;">
+          </label>
+          <span id="csv-template" class="small text-muted">
+            <i class="fa fa-file-excel-o"></i> Download CSV Template
+          </span>
+        </div>
+
+        <!-- Add Single User Form -->
+        <form id="targetForm" class="row">
+          <div class="col-sm-3">
+            <input type="text" class="form-control" placeholder="First Name" id="firstName">
+          </div>
+          <div class="col-sm-3">
+            <input type="text" class="form-control" placeholder="Last Name" id="lastName">
+          </div>
+          <div class="col-sm-3">
+            <input type="email" class="form-control" placeholder="Email" id="email" required>
+          </div>
+          <div class="col-sm-3">
+            <input type="text" class="form-control" placeholder="Position" id="position">
+          </div>
+          <div class="col-sm-12 text-right" style="margin-top:10px;">
+            <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i> Add</button>
+          </div>
+        </form>
+
+        <!-- Users Table -->
+        <table id="targetsTable" class="table table-hover table-striped" style="margin-top: 20px;">
+          <thead>
+            <tr>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Email</th>
+              <th>Position</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="modalSubmit">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+ document.addEventListener("DOMContentLoaded", function () {
+    const targetForm = document.getElementById("targetForm");
+    const targetsTableBody = document.querySelector("#targetsTable tbody");
+    const groupTableBody = document.querySelector("#groupTableBody");
+    const modalSubmitButton = document.getElementById("modalSubmit");
+    const groupNameInput = document.getElementById("name");
+
+    let currentGroupId = null;
+
+    // Event listener for edit and delete buttons
+    document.querySelector('#groupTable').addEventListener('click', function (event) {
+        if (event.target.classList.contains('edit-btn')) {
+            const groupId = event.target.getAttribute('data-group-id');
+            editGroup(groupId);
+        }
+
+        if (event.target.classList.contains('delete-btn')) {
+            const groupId = event.target.getAttribute('data-group-id');
+            deleteGroup(groupId);
+        }
+    });
+
+    // Add user to the modal table
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const position = document.getElementById("position").value.trim();
+
+      if (!firstName || !lastName || !email) {
+        alert("First Name, Last Name, and Email are required!");
+        return;
+      }
+
+      const newRow = document.createElement("tr");
+      newRow.innerHTML = `        
+          <td>${firstName}</td>
+          <td>${lastName}</td>
+          <td>${email}</td>
+          <td>${position}</td>
+          <td>
+              <button class="btn btn-danger btn-sm" onclick="deleteUserRow(this)">Delete</button>
+          </td>
+      `;
+      targetsTableBody.appendChild(newRow);
+      targetForm.reset();
+    }
+
+    // Delete user row from modal table
+    function deleteUserRow(button) {
+      const row = button.closest("tr");
+      row.remove();
+    }
+
+    // Save group and users to the database
+    function saveGroupData() {
+      const groupName = groupNameInput.value.trim();
+      const users = [];
+
+      // Collect users from modal table
+      document.querySelectorAll("#targetsTable tbody tr").forEach(row => {
+        const cells = row.querySelectorAll("td");
+        users.push({
+          firstName: cells[0].textContent,
+          lastName: cells[1].textContent,
+          email: cells[2].textContent,
+          position: cells[3].textContent
+        });
+      });
+
+      if (!groupName || users.length === 0) {
+        alert("Group name and at least one user are required!");
+        return;
+      }
+
+      // Send data to backend for saving
+      fetch("/save-group/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ group_name: groupName, users: users })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            alert(`Error: ${data.error}`);
+          } else {
+            alert("Group saved successfully!");
+            $('#modal').modal('hide'); // Close modal
+            loadGroups(); // Refresh groups
+          }
+        })
+        .catch(err => console.error("Error saving group:", err));
+    }
+
+    // Event listener for adding users
+    targetForm.addEventListener("submit", handleFormSubmit);
+
+    // Event listener for modal submit
+    modalSubmitButton.addEventListener("click", saveGroupData);
+
+    // Load groups when the page is ready
+    function loadGroups() {
+        fetch("/fetch_groups/")
+        .then(response => response.json())
+        .then(data => {
+            groupTableBody.innerHTML = ""; // Clear existing rows
+
+            data.groups.forEach(group => {
+                const newRow = document.createElement("tr");
+                newRow.innerHTML = `
+                    <td>${group.name}</td>
+                    <td>${group.user_count}</td>
+                    <td>${group.updated_at}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm delete-btn" data-group-id="${group.id}">Delete</button>
+                        <button class="btn btn-info btn-sm edit-btn" data-group-id="${group.id}">Edit</button>
+                    </td>
+                `;
+                groupTableBody.appendChild(newRow);
+            });
+        })
+        .catch(err => console.error("Error loading groups:", err));
+    }
+
+    // Delete group
+    function deleteGroup(groupId) {
+      if (confirm("Are you sure you want to delete this group?")) {
+        fetch(`/delete-group/${groupId}/`, { method: "DELETE" })
+          .then(response => response.json())
+          .then(data => {
+            if (data.message) {
+              alert("Group deleted successfully!");
+              loadGroups(); // Refresh groups
+            } else {
+              alert("Error deleting group!");
+            }
+          })
+          .catch(err => console.error("Error deleting group:", err));
+      }
+    }
+
+    // Edit group
+    function editGroup(groupId) {
+      fetch(`/group-details/${groupId}/`)
+        .then(response => response.json())
+        .then(data => {
+          groupNameInput.value = data.group.name;
+          loadUsersForGroup(groupId);
+          $('#modal').modal('show');
+        })
+        .catch(err => console.error("Error loading group details:", err));
+    }
+
+    // Load users for a specific group (for editing)
+    function loadUsersForGroup(groupId) {
+      fetch(`/group-users/${groupId}/`)
+        .then(response => response.json())
+        .then(data => {
+          const targetsTableBody = document.querySelector("#targetsTable tbody");
+          targetsTableBody.innerHTML = ""; // Clear existing rows
+
+          data.users.forEach(user => {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+              <td>${user.first_name}</td>
+              <td>${user.last_name}</td>
+              <td>${user.email}</td>
+              <td>${user.position}</td>
+              <td>
+                <button class="btn btn-danger btn-sm" onclick="deleteUserRow(this, ${user.id})">Delete</button>
+              </td>
+            `;
+            targetsTableBody.appendChild(newRow);
+          });
+        })
+        .catch(err => console.error("Error loading group users:", err));
+    }
+
+    // Delete user from the database (called from modal table)
+    function deleteUserRow(button, userId) {
+      const row = button.closest("tr");
+      row.remove();
+
+      fetch(`/delete-user/${userId}/`, { method: "DELETE" })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message) {
+            console.log("User deleted successfully");
+          } else {
+            console.error("Error deleting user");
+          }
+        })
+        .catch(err => console.error("Error deleting user:", err));
+    }
+
+    // Load groups on page load
+    loadGroups();
+  });
+</script>
+
+
+{% endblock javascripts %}
+
+
+
+<!-- ------------------------------------------------------------------------------------------------- -->
+
+
+
+
+
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<style>
+  /* General Layout Styles */
+  body {
+    font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+  }
+
+  .main {
+    margin-top: 20px;
+  }
+
+  .page-header {
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #444;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background-color: #2980b9;
+    border-color: #2980b9;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .btn-primary:hover {
+    background-color: #1f618d;
+    border-color: #1a5276;
+  }
+
+  .btn {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Table */
+  table.table {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  table.table th,
+  table.table td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+  }
+
+  /* Modal */
+  .modal-header {
+    background-color: #f3f4f5;
+    color: #444;
+    border-bottom: 2px solid #ccc;
+  }
+
+  .modal-title {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-footer {
+    border-top: 2px solid #ddd;
+  }
+
+  /* Form elements */
+  .form-group input {
+    margin-bottom: 10px;
+  }
+
+  /* No Profile Message */
+  .no-profile {
+    background-color: #dfe6e9;
+    padding: 10px;
+    color: #444;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 1px dashed #b2bec3;
+  }
+
+  /* Line Separator */
+  .line {
+    width: 100%;
+    height: 1px;
+    background-color: #ccc;
+    margin-bottom: 20px;
+  }
+</style>
+{% endblock stylesheets %}

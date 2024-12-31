@@ -1,0 +1,143 @@
+<!-- email_template.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <div class="popup" id="profilePopup">
+        <div class="popup-content">
+            <span class="close-button" onclick="closePopup('profilePopup')">&times;</span>
+            <h2>Create Profile</h2>
+            <div class="profile">
+                <label for="profileName" class="profile-label">Name:</label>
+                <input type="text" id="profileName" class="profile-input" placeholder="Profile name">
+                <label for="smtpServer" class="profile-label">Interface Type:</label>
+                <input type="text" id="smtpServer" class="profile-input" placeholder="SMTP ">
+                <label for="port" class="profile-label">SMTP From:</label>
+                <input type="text" id="port" class="profile-input" placeholder="<test@example.com>">
+                <label for="username" class="profile-label">Host:</label>
+                <input type="text" id="username" class="profile-input" placeholder="smtp.example.com:10">
+                <label for="admin" class="profile-label">Username:</label>
+                <input type="text" id="admin" class="profile-input" placeholder="admin">
+                <label for="password" class="profile-label">Password:</label>
+                <input type="password" id="password" class="profile-input" placeholder="Password">
+                <button class="edit-button" onclick="editProfile()">Edit Profile</button>
+                <button class="save-profile" onclick="saveProfile()">Save Profile</button>
+                <button class="send-email-button" onclick="openEmailPopup()">Send Test Email</button>
+            </div>                                              
+        </div>
+    </div>
+
+    <!-- //Popup for sending a test email -->
+    <div class="popup" id="emailPopup">
+        <div class="popup-content">
+            <span class="close-button" onclick="closePopup('emailPopup')">&times;</span>
+            <h2>Send Test Email</h2>
+            <div class="email-details">
+                <label for="to" class="profile-label">To:</label>
+                <input type="text" id="to" class="profile-input" placeholder="Recipient's Email">
+                <label for="subject" class="profile-label">Subject:</label>
+                <input type="text" id="subject" class="profile-input" placeholder="Email Subject">
+                <label for="message" class="profile-label">Message:</label>
+                <textarea id="message" class="profile-input" rows="4" placeholder="Email Message"></textarea>
+                <button class="send-email-button" onclick="sendTestEmail()">Send Email</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function openProfilePopup() {
+      openPopup('profilePopup');
+   }  
+
+    function openSendingProfilePage() {
+       console.log("Opening Sending Profile Page");
+    }
+
+     // JavaScript function to open the Sending Profile page
+     function openSendingProfilePage() {
+// // You can use window.location or other methods to navigate to the Sending Profile page.
+// // For simplicity, we'll just log a message for this example.
+       console.log("Opening Sending Profile Page");
+    }
+    // // JavaScript function to open a popup
+     function openPopup(popupId) {
+         var popup = document.getElementById(popupId);
+         popup.style.display = 'block';  //  //Corrected from popup.style display
+    }
+
+   // // JavaScript function to close a popup
+     function closePopup(popupId) {
+         var popup = document.getElementById(popupId);
+         popup.style.display = 'none'; //// Corrected from popup.style display
+     }
+
+  //  // JavaScript function to open the profile popup
+     function openProfilePopup() {
+         openPopup('profilePopup');
+     }
+
+   // // JavaScript function to edit the profile
+     function editProfile() {
+    //    // Enable the form fields for editing
+     document.getElementById('profileName').disabled = false;
+         document.getElementById('smtpServer').disabled = false;
+         document.getElementById('port').disabled = false;
+         document.getElementById('username').disabled = false;
+         document.getElementById('password').disabled = false;
+     }
+
+    function saveProfile() {
+var profileData = {
+    profileName: document.getElementById('profileName').value,
+    smtpServer: document.getElementById('smtpServer').value,
+    port: document.getElementById('port').value,
+    username: document.getElementById('username').value,
+    password: document.getElementById('password').value,
+};
+
+// Store the profile data in localStorage
+localStorage.setItem('profileData', JSON.stringify(profileData));
+
+// Disable the form fields after saving
+document.getElementById('profileName').disabled = true;
+document.getElementById('smtpServer').disabled = true;
+document.getElementById('port').disabled = true;
+document.getElementById('username').disabled = true;
+document.getElementById('password').disabled = true;
+
+// Close the profile popup
+closePopup('profilePopup');
+
+// Reload the page to update the sending profile (you may use a more efficient method)
+location.reload();
+}
+
+
+   // // JavaScript function to open the email popup
+    function openEmailPopup() {
+        openPopup('emailPopup');
+    }
+
+   // JavaScript function to send a test email
+    function sendTestEmail() {
+        var to = document.getElementById('to').value;
+        var subject = document.getElementById('subject').value;
+        var message = document.getElementById('message').value;
+
+        // Log the data in sentence case with labels
+        console.log("To: " + to);
+        console.log("Subject: " + subject);
+        console.log("Message: " + message);
+
+        // Close the email popup
+        closePopup('emailPopup');
+    }
+ 
+     </script> 
+</body>
+</html>

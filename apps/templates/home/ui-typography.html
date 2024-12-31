@@ -1,0 +1,875 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Typography {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<style>
+    /* Add some basic CSS for styling */
+
+
+    /* General Layout Styles */
+    body {
+        font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.72222;
+        /* color: #50a4e5; */
+        color: #080810;
+    }
+
+    .main .page-header {
+        margin-top: 0;
+        color: #071018;
+
+    }
+
+    .page-header {
+        padding-bottom: 9px;
+        margin: 40px 0 20px;
+        border-bottom: 700px solid #eee;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        color: #fff;
+        background-color: #2980b9;
+        border-color: #2980b9;
+        margin-top: 34px;
+        margin-left: 45px;
+        box-shadow: 0 2px 2px 0 rgba(156, 39, 176, 0.14), 0 3px 1px -2px rgba(156, 39, 176, 0.2), 0 1px 5px 0 rgba(156, 39, 176, 0.12);
+    }
+
+    .btn.btn-danger.btn-file {
+        margin-top: 295px;
+    }
+
+    .btn-primary {
+        background-color: #2980b9;
+        border-color: #2471a3;
+
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2471a3;
+
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        display: flex;
+        align-items: left;
+        justify-content: left;
+        height: 100vh;
+        flex-direction: column;
+    }
+
+    .title {
+        font-size: 36px;
+        margin-bottom: 20px;
+        text-align: left;
+        background-color: #f3f4f5;
+        color: #0e0c0c;
+        border-bottom: 1px solid #080808;
+    }
+
+    .line {
+        width: 100%;
+        height: 1px;
+        background-color: #0c0606;
+    }
+
+    /* Modals */
+    .modal-header {
+        background-color: #f3f4f5;
+        color: #0e0c0c;
+        border-bottom: 1px solid #080808;
+    }
+
+    .modal-title {
+        margin: inherit;
+        line-height: 1.42857143;
+        background-color: #f3f4f5;
+        color: #0e0c0c;
+        border-bottom: 1px solid #080808;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #ddd;
+        padding: 15px;
+    }
+
+    .btn {
+        background-color: #007BFF;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        margin-bottom: 10px;
+        position: absolute;
+        top: 37%;
+        width: 10vw;
+
+        text-align: center;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    /* Popup styles */
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    #modalSubmit {
+        margin-top: 322px;
+        width: 139px;
+    }
+
+    #modalSubmitt {
+        margin-top: 48px;
+        width: 139px;
+    }
+
+
+    .name-input-container {
+        text-align: left;
+    }
+
+    .name-label {
+        display: block;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .name-input {
+        width: 100%;
+        padding: 5px;
+        margin-top: 5px;
+    }
+
+    .no-profile {
+        background-color: #8db8e3;
+        color: white;
+        padding: 10px;
+    }
+</style>
+
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+    <div class="row">
+        <h1>Email Template</h1>
+        <div class="line"></div>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        {% include 'includes/flash_messages.html' %}
+        <p class="no-profile" id="noProfileMessage">No Email template created yet. Let's try to create one.</p>
+        &nbsp;
+        <!-- {% include 'includes/flash_messages.html' %} -->
+        <!-- &nbsp; -->
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <div class="row"></div>
+        <div class="row">
+            <button type="button" style="font-size: 14px;" class="btn btn-primary" onclick="edit(-1)" data-toggle="modal" data-backdrop="static"
+                data-target="#modal"><i class="fa fa-plus"></i> New Template</button>
+        </div>
+        &nbsp;
+        &nbsp;
+        &nbsp;
+        <!-- <p>&nbsp;</p> -->
+        {% comment %} <div id="loading">
+            <i class="fa fa-spinner fa-spin fa-4x"></i>
+        </div> {% endcomment %}
+        <div id="successMessageContainer" class="row" style="display:none;">
+            <div class="alert alert-success">
+                <strong>Success!</strong> Your email template has been saved.
+            </div>
+        </div>
+
+       
+    </div>
+    <div class="data">
+        <table id="templateTable" class="table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>subject</th>
+
+                    <th>Data</th>
+                    <th>Date</th>
+                    <th>Action</th>
+
+
+                    <th class="col-md-2 no-sort"></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <!-- Modal -->
+    <!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content" style="font-family: Arial, sans-serif; font-size: 14px;">
+        <div class="modal-header" style="border-bottom: 1px solid #ddd; padding: 10px 15px;">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="dismiss()" style="font-size: 20px; color: #000;">&times;</button>
+          <h4 class="modal-title" id="templateModalLabel" style="margin: 0; font-weight: bold;">New Template</h4>
+        </div>
+        <div class="modal-body" style="padding: 15px;">
+  
+          <!-- Flash Messages -->
+          <div class="row" id="modal.flashes"></div>
+  
+          <!-- Name Field -->
+          <label class="control-label" for="name">Name:</label>
+          <div class="form-group">
+            <input type="text" class="form-control" id="name" placeholder="Template name" autofocus style="width: 100%; padding: 8px; margin-bottom: 15px; border: 2px solid #ddd; border-radius: 4px;" />
+          </div>
+  
+          <!-- Import Email Button -->
+          <div class="form-group">
+            <button class="btn btn-danger" data-toggle="modal" data-backdrop="static" data-target="#importEmailModal" style="padding: 5px 10px; font-size: 14px;">
+              <i class="fa fa-envelope"></i> Import Email
+            </button>
+          </div>
+  
+          <!-- Envelope Sender -->
+          <label class="control-label" for="envelope-sender">Envelope Sender:</label>
+          <div class="form-group">
+            <input type="text" class="form-control" id="envelope-sender" placeholder="First Last <test@example.com>" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;" />
+          </div>
+  
+          <!-- Subject -->
+          <label class="control-label" for="subject">Subject:</label>
+          <div class="form-group">
+            <input type="text" class="form-control" id="subject" placeholder="Email Subject" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;" />
+          </div>
+  
+          <!-- Tabs -->
+          <ul class="nav nav-tabs" role="tablist" style="border-bottom: 1px solid #ddd; margin-bottom: 10px;">
+            <li class="active" role="text">
+              <a href="#text" aria-controls="text" role="tab" data-toggle="tab" style="padding: 10px 15px; font-size: 14px; color: #000;">Text</a>
+            </li>
+            <li role="html">
+              <a href="#html" aria-controls="html" role="tab" data-toggle="tab" style="padding: 10px 15px; font-size: 14px; color: #000;">HTML</a>
+            </li>
+          </ul>
+  
+          <!-- Tab Content -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="text">
+              <textarea rows="10" id="text_editor" class="form-control" placeholder="Plaintext" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="html">
+              <textarea id="html_editor" style="width: 100%; height: 150px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+            </div>
+          </div>
+  
+          <!-- Checkbox -->
+          <div class="checkbox checkbox-primary" style="margin-top: 15px;">
+            <input id="use_tracker_checkbox" type="checkbox" checked />
+            <label for="use_tracker_checkbox">Add Tracking Image</label>
+          </div>
+  
+          <!-- Add Files Button -->
+          <span class="btn btn-danger btn-file" style="margin-top: 300px; padding: 5px 5px;">
+            <i class="fa fa-plus"></i> Add Files
+            <input id="attachmentUpload" type="file" onchange="attach(this.files)" multiple style="display: none;" />
+          </span>
+  
+          <!-- Show Entries and Search -->
+          <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <label for="showEntries">Show </label>
+              <select id="showEntries" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                <option>10</option>
+                <option>25</option>
+                <option>50</option>
+                <option>100</option>
+              </select>
+              entries
+            </div>
+            <div>
+              <label for="searchBox" style="margin-right: 5px;">Search:</label>
+              <input type="text" id="searchBox" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;" />
+            </div>
+          </div>
+  
+          <!-- Horizontal Line -->
+          <hr style="border-top: 1px solid #ddd; margin-top: 20px; margin-bottom: 15px;" />
+  
+          <!-- Attachments Table -->
+          <table id="attachmentsTable" class="table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th style="width: 10%; text-align: left; border-bottom: 1px solid #ddd; padding: 8px;"> </th>
+                <th style="width: 70%; text-align: left; border-bottom: 1px solid #ddd; padding: 8px;">Name</th>
+                <th style="width: 10%; text-align: left; border-bottom: 1px solid #ddd; padding: 8px;"> </th>
+                <th style="display: none;">Content</th>
+                <th style="display: none;">Type</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+  
+        <!-- Modal Footer -->
+        <div class="modal-footer" style="padding: 10px 15px; border-top: 1px solid #ddd;">
+          {% comment %} <button type="button" data-dismiss="modal" class="btn btn-default" onclick="dismiss()" style="padding: 10px 15px; font-size: 14px;">Cancel</button> {% endcomment %}
+          <button type="button" class="btn btn-primary" id="modalSubmit" style="padding: 5px 10px; font-size: 14px;">Save Template</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+    <!-- Modal -->
+    <div class="modal fade" id="importEmailModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <!-- New Email Modal -->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="importEmailModalLabel">Import Email</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" id="modal.flashes"></div>
+                    <label class="control-label" for="email">Email Content:</label>
+                    <div class="form-group">
+                        <textarea rows="10" id="email_content" class="gophish-editor form-control"
+                            placeholder="Raw Email Source"></textarea>
+                    </div>
+                    <div class="checkbox checkbox-primary">
+                        <input id="convert_links_checkbox" type="checkbox" checked>
+                        <label for="convert_links_checkbox">Change Links to Point to Landing Page</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-primary" id="modalSubmitt"
+                        onclick="importEmail()">Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock content %}
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="row">
+            <h1>Email Template</h1>
+            <div class="line"></div>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            {% include 'includes/flash_messages.html' %}
+            <p class="no-profile" id="noProfileMessage">No Email template created yet. Let's try to create one.</p>
+            &nbsp;
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <div class="row">
+                <button type="button" class="btn btn-primary" onclick="edit(-1)" data-toggle="modal"
+                    data-backdrop="static" data-target="#modal"><i class="fa fa-plus"></i> New Template</button>
+            </div>
+            &nbsp;
+            &nbsp;
+            &nbsp;
+        </div>
+        <div id="loading">
+            <i class="fa fa-spinner fa-spin fa-4x"></i>
+        </div>
+
+        <div class="row">
+            <table id="templateTable" class="table" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Modified Date</th>
+                        <th class="col-md-2 no-sort"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+   {% comment %} <!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content" style="font-family: Arial, sans-serif; font-size: 14px;">
+        <div class="modal-header" style="border-bottom: 1px solid #ddd; padding: 10px 15px;">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="dismiss()" style="font-size: 20px; color: #000;">&times;</button>
+          <h4 class="modal-title" id="templateModalLabel" style="margin: 0; font-weight: bold;">New Template</h4>
+        </div>
+        <div class="modal-body" style="padding: 15px;">
+  
+          <!-- Flash Messages -->
+          <div class="row" id="modal.flashes"></div>
+  
+          <!-- Name Field -->
+          <label class="control-label" for="name">Name:</label>
+          <div class="form-group">
+            <input type="text" class="form-control" id="name" placeholder="Template name" autofocus style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;" />
+          </div>
+  
+          <!-- Import Email Button -->
+          <div class="form-group">
+            <button class="btn btn-danger" data-toggle="modal" data-backdrop="static" data-target="#importEmailModal" style="padding: 10px 15px; font-size: 14px;">
+              <i class="fa fa-envelope"></i> Import Email
+            </button>
+          </div>
+  
+          <!-- Envelope Sender -->
+          <label class="control-label" for="envelope-sender">Envelope Sender:</label>
+          <div class="form-group">
+            <input type="text" class="form-control" id="envelope-sender" placeholder="First Last <test@example.com>" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;" />
+          </div>
+  
+          <!-- Subject -->
+          <label class="control-label" for="subject">Subject:</label>
+          <div class="form-group">
+            <input type="text" class="form-control" id="subject" placeholder="Email Subject" style="width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;" />
+          </div>
+  
+          <!-- Tabs -->
+          <ul class="nav nav-tabs" role="tablist" style="border-bottom: 1px solid #ddd; margin-bottom: 10px;">
+            <li class="active" role="text">
+              <a href="#text" aria-controls="text" role="tab" data-toggle="tab" style="padding: 10px 15px; font-size: 14px; color: #000;">Text</a>
+            </li>
+            <li role="html">
+              <a href="#html" aria-controls="html" role="tab" data-toggle="tab" style="padding: 10px 15px; font-size: 14px; color: #000;">HTML</a>
+            </li>
+          </ul>
+  
+          <!-- Tab Content -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="text">
+              <textarea rows="10" id="text_editor" class="form-control" placeholder="Plaintext" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="html">
+              <textarea id="html_editor" style="width: 100%; height: 150px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+            </div>
+          </div>
+  
+          <!-- Checkbox -->
+          <div class="checkbox checkbox-primary" style="margin-top: 15px;">
+            <input id="use_tracker_checkbox" type="checkbox" checked />
+            <label for="use_tracker_checkbox">Add Tracking Image</label>
+          </div>
+  
+          <!-- Add Files Button -->
+          <span class="btn btn-danger btn-file" style="margin-top: 10px;">
+            <i class="fa fa-plus"></i> Add Files
+            <input id="attachmentUpload" type="file" onchange="attach(this.files)" multiple style="display: none;" />
+          </span>
+  
+          <!-- Show Entries and Search -->
+          <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <label for="showEntries">Show </label>
+              <select id="showEntries" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                <option>10</option>
+                <option>25</option>
+                <option>50</option>
+                <option>100</option>
+              </select>
+              entries
+            </div>
+            <div>
+              <label for="searchBox" style="margin-right: 5px;">Search:</label>
+              <input type="text" id="searchBox" style="padding: 5px; border: 1px solid #ddd; border-radius: 14px;" />
+            </div>
+          </div>
+  
+          <!-- Horizontal Line -->
+          <hr style="border-top: 1px solid #ddd; margin-top: 20px; margin-bottom: 15px;" />
+  
+          <!-- Attachments Table -->
+          <table id="attachmentsTable" class="table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th style="width: 10%; text-align: left; border-bottom: 1px solid #ddd; padding: 8px;"> </th>
+                <th style="width: 70%; text-align: left; border-bottom: 1px solid #ddd; padding: 8px;">Name</th>
+                <th style="width: 10%; text-align: left; border-bottom: 1px solid #ddd; padding: 8px;"> </th>
+                <th style="display: none;">Content</th>
+                <th style="display: none;">Type</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+  
+        <!-- Modal Footer -->
+        <div class="modal-footer" style="padding: 10px 15px; border-top: 1px solid #ddd;">
+          <button type="button" data-dismiss="modal" class="btn btn-default" onclick="dismiss()" style="padding: 10px 15px; font-size: 14px;">Cancel</button>
+          <button type="button" class="btn btn-primary" id="modalSubmit" style="padding: 10px 15px; font-size: 14px;">Save Template</button>
+        </div>
+      </div>
+    </div>
+  </div> {% endcomment %}
+  
+    <!-- Import Email Modal -->
+    <div class="modal fade" id="importEmailModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="importEmailModalLabel">Import Email</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" id="modal.flashes"></div>
+                    <label class="control-label" for="email">Email Content:</label>
+                    <div class="form-group">
+                        <textarea rows="10" id="email_content" class="form-control"
+                            placeholder="Raw Email Source"></textarea>
+                    </div>
+                    <div class="checkbox checkbox-primary">
+                        <input id="convert_links_checkbox" type="checkbox" checked>
+                        <label for="convert_links_checkbox">Change Links to Point to Landing Page</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="importEmailSubmit"
+                        onclick="importEmail()">Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    {% block javascripts %}
+    <script src="../../static/assets/js/src/vendor/ckeditor/ckeditor.js"></script>
+    <script src="../../static/assets/js/src/vendor/ckeditor/adapters/jquery.js"></script>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <script>
+        function edit(id) {
+            if (id === -1) {
+                console.log("Create a new template");
+            } else {
+                console.log("Edit template with ID:", id);
+            }
+        }
+
+        function dismiss() {
+            console.log("Modal dismissed");
+        }
+
+        function importEmail() {
+            const emailContent = document.getElementById("email_content").value; // Get the imported email content
+            const textEditor = document.getElementById("text_editor"); // Reference the Plaintext editor
+
+            // Check which tab is currently active
+            const activeTab = document.querySelector('.nav-tabs .active a').getAttribute('href');
+
+            // paste the content in text editor
+            textEditor.value = emailContent;
+
+            console.log("imported email content successfully set in the active editor.");
+        }
+
+        // helper functions 
+        function parseEmail() {
+            const rawEmail = document.getElementById("text_editor").value;
+            console.log("raw email: ", rawEmail)
+            const emailBody = extractEmailBody(rawEmail);
+
+            return emailBody;
+        }
+
+        function extractEmailBody(rawEmail) {
+            // Decode base64-encoded parts of the email
+            const base64Regex = /Content-Transfer-Encoding: base64([\s\S]*?)--/i;
+            const match = rawEmail.match(base64Regex);
+
+            if (match && match[1]) {
+                try {
+                    const decoded = atob(match[1].trim()); // Decode base64
+                    return decoded;
+                } catch (error) {
+                    console.error("Error decoding base64 content:", error);
+                }
+            }
+
+            // Extract plain text part as a fallback
+            const plainTextRegex = /Content-Type: text\/plain;[\s\S]*?\n\n([\s\S]*?)\n--/i;
+            const plainTextMatch = rawEmail.match(plainTextRegex);
+            if (plainTextMatch && plainTextMatch[1]) {
+                return plainTextMatch[1].trim().replace(/\n/g, "<br>"); // Replace newlines with <br>
+            }
+
+            return "No email body found!";
+        }
+
+        // register click event on the "HTML" button | tab switching
+        document.addEventListener('DOMContentLoaded', function() {
+           document
+           .querySelector('li[role="html"]') 
+           .addEventListener('click', function(e) {
+                if(!CKEDITOR.instances['html_editor']) {
+                    e.preventDefault(); // prevent default tab switch
+
+                    CKEDITOR.replace('html_editor');    
+                }
+
+                const html_editor = CKEDITOR.instances['html_editor'];
+                const text_editor = document.getElementById('text_editor');
+
+                const rawEmail = text_editor.value;
+
+                // get content from 'text_editor'
+                // parse the email to its raw form
+                // render it in the editor
+                const emailBody = parseEmail(rawEmail)
+                console.log(emailBody)
+
+                // set 
+                html_editor.setData(emailBody)
+            })
+        })
+
+        function attach(files) {
+            console.log("Attaching files:", files);
+        }
+
+        document.getElementById("modalSubmit").addEventListener("click", function () {
+            // Collect form data
+            const templateName = document.getElementById("name").value;
+            const envelopeSender = document.getElementById("envelope-sender").value;
+            const subject = document.getElementById("subject").value;
+            const useTracker = document.getElementById("use_tracker_checkbox").checked;
+            const textContent = document.getElementById("text_editor").value;
+            const htmlContent = document.getElementById("html_editor").value;
+
+            // Log the collected data for debugging
+            console.log("Collected data:", {
+                templateName,
+                envelopeSender,
+                subject,
+                useTracker,
+                textContent,
+                htmlContent
+            });
+
+            // Prepare the data object to send to the server
+            const templateData = {
+                name: templateName || "",  // Allow empty values if not filled
+                envelope_sender: envelopeSender || "",  // Allow empty values if not filled
+                subject: subject || "",  // Allow empty values if not filled
+                use_tracker: useTracker,
+                text_content: textContent || "",  // Allow empty values if not filled
+                html_content: htmlContent || ""  // Allow empty values if not filled
+            };
+
+            // Send data to the server using fetch or AJAX
+            fetch('http://127.0.0.1:8000/save_email_template/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(templateData)
+            }).then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    alert(data.message);  // Show success message to the user
+                    dismiss();  // Close the modal after success
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving the template.');
+                });
+                function addTemplateRow(templateData) {
+                    const templateTableBody = document.querySelector("#templateTable tbody");
+                    const templateTable = document.querySelector("#templateTable");
+        
+                    // Check if the templateData is valid and contains the necessary fields
+                    if (templateData && templateData.templateName && templateData.subject && templateData.textContent && templateData.modified_date) {
+                        const templateName = templateData.templateName || "Untitled";
+                        const subject = templateData.subject || "No Subject";
+                        const textContent = templateData.textContent || "No Content";
+                        const modifiedDate = templateData.modified_date || "No Date";
+        
+                        const newRow = document.createElement("tr");
+        
+                        newRow.innerHTML = `
+                            <td>${templateName}</td>
+                            <td>${subject}</td>
+                            <td>${textContent}</td>
+                            <td>${modifiedDate}</td>
+                            <td>
+                                <div >
+                                <button 
+                                    class="btn btn-primary editBtn" 
+                                    style="padding: 2px 6px; font-size: 10px; line-height: 1.2;  width: 70px;" 
+                                    data-id="${templateData.id || 0}">
+                                    Edit
+                                </button>
+                                <button 
+                                    class="btn btn-danger deleteBtn" 
+                                    style="padding: 2px 6px; font-size: 10px; line-height: 1.2;  width: 70px;" 
+                                    data-id="${templateData.id || 0}">
+                                    Delete
+                                </button>
+                            </div>
+                            </td>
+                        `;
+        
+                        templateTableBody.appendChild(newRow);
+                        templateTable.style.display = "table";  // Show the table after adding a row
+                    } else {
+                        console.error('Error: Template data not found or incomplete.', templateData);
+                    }
+                }
+        
+                // Delete template function
+                function deleteTemplate(id) {
+                    console.log("Delete button clicked for template ID:", id);
+        
+                    // Ensure the CSRF token is present in the DOM
+                    const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]');
+        
+                    if (!csrfToken) {
+                        console.error('CSRF token element not found!');
+                        return;
+                    }
+        
+                    // Get the CSRF token value
+                    const csrfTokenValue = csrfToken.value;
+        
+                    fetch(`http://127.0.0.1:8000/api/delete_template/${id}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfTokenValue, // Use the token value here
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Template deleted successfully:', data);
+                        // Remove the template row from the table
+                        const rowToDelete = document.querySelector(`[data-id="${id}"]`).closest('tr');
+                        if (rowToDelete) {
+                            rowToDelete.remove();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting template:', error);
+                    });
+                }
+        
+                // Edit template function
+                function editTemplate(id) {
+                    console.log("Edit button clicked for template ID:", id);
+                    // Add further edit logic here (e.g., opening a modal with template details)
+                }
+        
+                // Submit modal function
+                document.getElementById("modalSubmit").addEventListener("click", function () {
+                    const templateName = document.getElementById("name").value;
+                    const envelopeSender = document.getElementById("envelope-sender").value;
+                    const subject = document.getElementById("subject").value;
+                    const useTracker = document.getElementById("use_tracker_checkbox").checked;
+                    const textContent = document.getElementById("text_editor").value;
+                    const htmlContent = document.getElementById("html_editor").value;
+        
+                    console.log("Collected data:", {
+                        templateName,
+                        envelopeSender,
+                        subject,
+                        useTracker,
+                        textContent,
+                        htmlContent
+                    });
+        
+                    const templateData = {
+                        templateName: templateName || "",
+                        envelopeSender: envelopeSender || "",
+                        subject: subject || "",
+                        useTracker: useTracker,
+                        textContent: textContent || "",
+                        htmlContent: htmlContent || ""
+                    };
+        
+                    fetch('http://127.0.0.1:8000/save_email_template/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(templateData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Template saved successfully:', data);
+                        if (data.status === 'success') {
+                            // Ensure the data contains all required fields
+                            addTemplateRow({
+                                templateName: templateData.templateName,
+                                subject: templateData.subject,
+                                textContent: templateData.textContent,
+                                modified_date: new Date().toISOString(), // Add the current date as a placeholder
+                                id: data.id || 0
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error saving template:', error);
+                    });
+                });
+        
+                // Fetch existing templates when page loads
+                function fetchTemplates() {
+                    fetch('http://127.0.0.1:8000/api/fetch_templates/')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.templates && Array.isArray(data.templates)) {
+                                data.templates.forEach(template => {
+                                    addTemplateRow(template);
+                                });
+                            } else {
+                                console.error("Fetched data is not in the expected format:", data);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching templates:', error);
+                        });
+                }
+        
+                // Event delegation for dynamically added Edit/Delete buttons
+                document.querySelector('#templateTable').addEventListener('click', function (event) {
+                    const id = event.target.getAttribute('data-id');
+                    if (event.target.classList.contains('editBtn')) {
+                        edit(id);
+                    } else if (event.target.classList.contains('deleteBtn')) {
+                        deleteTemplate(id);
+                    }
+                });
+        
+                // Fetch templates when the page loads
+                fetchTemplates();
+        });
+
+        
+
+
+    </script>
+    {% endblock javascripts %}
